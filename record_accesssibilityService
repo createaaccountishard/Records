@@ -20,3 +20,7 @@ service 的 findFocus(int focus)//获取不同类型的焦点,通常文本输入
            
            
 nodeinfo的 performAction(),可以通过bundle进行值的传递.
+
+使用实例: apk自动安装
+         抢红包
+         检测app是否前台
