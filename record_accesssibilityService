@@ -1,0 +1,22 @@
+无障碍服务
+
+  和一般服务类似,运行在后台,能够接受系统发出的一系列事件,,比如焦点改变,输入内容变化,按钮被点击了等等,该种服务能够请求获取当前活动窗口并查找其中的内容.
+就好像对窗口进行了监听一样.
+
+涉及的类:
+accesssibilityService: 服务,用户监听事件,并做出反应
+accessibilityServiceInfo:无障碍服务的信息类,储存了该服务的所有信息
+accessibilityEvent: 无障碍事件,发生的类别和时间等信息.继承accessibilityRecord.
+accessibilityNodeInfo:事件的节点
+
+
+
+重要的方法等:
+ @see AccessibilityNodeInfo#FOCUS_INPUT
+ @see AccessibilityNodeInfo#FOCUS_ACCESSIBILITY
+service 的 findFocus(int focus)//获取不同类型的焦点,通常文本输入 
+           performGlobalAction(int action)//执行全局的操作
+           disableSelf()  //停止服务运行
+           
+           
+nodeinfo的 performAction(),可以通过bundle进行值的传递.
