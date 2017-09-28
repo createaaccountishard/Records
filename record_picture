@@ -14,7 +14,7 @@ android 下  colorMatrix 颜色矩阵
 val matrix=ColorMatrix() 
 matrix.setRotate()     设置  rgb
 matrix.setSaturation() 设置  饱和度
-matrix.setSaturation() 设置  亮度
+matrix.setScale() 设置  亮度
 
 matrix.postConcat()    可以将多个colormatrix 的对象合并成一个.多次调用,进行叠加,最终变成一个
       
