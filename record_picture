@@ -34,7 +34,38 @@ matrix.postConcat()    可以将多个colormatrix 的对象合并成一个.多�
 4 对paint 设置颜色矩阵,paint.setcolorfileter()
 5 在canvas上重新画出图片
 
-二 像素点
+二 像素点  
+ 
+像素点有argb四个要素组成, argb各有各的数值,那么他们组合在一起的话会得到一个新的数值
+
+ 获得像素点的集合
+ 
+        val width = old.width
+        val height = old.height
+        val newbitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        //像素点的个数,就是宽高的乘积
+        val oldPix = IntArray(width * height)
+        old.getPixels(oldPix, 0, width, 0, 0, width, height)
+ 
+ 获得每一个像素点下的rgb
+
+        for (i in oldPix.indices) {
+            val alpha=Color.alpha(oldPix[i])
+            val red = Color.red(oldPix[i])
+            val green = Color.green(oldPix[i])
+            val blue = Color.blue(oldPix[i])
+            //对每一个rgb进行处理
+            val newRed
+            val newGreen
+            val newBlue
+            newPix[i] = Color.argb(alpha,newRed, newGreen, newBlue)
+        }
+设置新的像素点给图片
+  newbitmap.setPixels(newPix, 0, width, 0, 0, width, height)
+
+
+
+特殊效果
 
 某个像素点的底片算法: 
 a.r=255-a.当前显示的r的值
@@ -46,9 +77,6 @@ a.b=255-a.当前显示的b的值
  int newR=(int) (0.393*oldR+0.769*oldG+0.189*oldB);
  int newG=(int) (0.349*oldR+0.686*oldG+0.168*oldB);
  int newB=(int) (0.272*oldR+0.534*oldG+0.131*oldB);
-
-
-
 
 
 
