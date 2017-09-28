@@ -1,3 +1,111 @@
+无障碍--为不能正常操作或者存在困难的用户进行的辅助操作
+
+本次使用案例-- 在不同的应用软件下,能通过按下指定的按键进行条码的扫描,并将扫描的结果显示在当前窗口的可编辑框内,主要是editext.
+
+分析 1 因为和应用无关,首先想的就是在系统的层次中进行设置. 直接修改系统源码. ~~~ 系统工程师可不好沟通~~~
+    2 通过后台服务能监听到指定的内容,从而进行操作.难点是怎么监听,执行操作和怎么将结果显示出来.
+    
+ 好吧,这个需求其实有点难搞,但是经过一通查询,讨论!@##$%%^... 使用到了如下的功能
+ 
+ android 无障碍服务
+ 
+ 使用:  1 创建一个类,继承AccessibilityService.
+         该类有2个必须实现的方法  onAccessibilityEvent(event: AccessibilityEvent?) 和  onInterrupt() 
+         前者是满足条件下的事件,记录了事件的信息.后者是某些条件些的打断情况.
+         通常用到如下的方法
+         oncreate()   onserviceconnected()   onaccessibilityevent()  oninterrept()    ununbind()  onkeydown()等
+       
+       2 在响应的方法下添加逻辑.
+           override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+           info = event?.source?.findFocus(AccessibilityNodeInfo.FOCUS_INPUT)
+           Log.i(TAG, "无障碍服务事件:" + info)
+    }
+          @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+           override fun onKeyEvent(event: KeyEvent?): Boolean {
+
+        if (event?.keyCode == KeyEvent.KEYCODE_CHANNEL_UP) {
+            if (info != null && !working) {
+
+                working = !working
+                //1 打开扫描头进行扫描
+
+                thread {
+                    val b = ByteArray(512)
+                    if (0 == Scanner.init()) {
+                        Log.i(TAG, "使用扫描头进行扫描")
+                        val ret = Scanner.decode(**, *, *)
+                        Scanner.deInit()
+                        val result = if (ret <= 0) {
+                            "扫描失败,请重新扫描"
+                        } else {
+                            String(b)
+                        }
+                        Log.i(TAG, "扫描结果:$result \n 扫描的返回数据的长度:$ret")
+                        val arguments = Bundle()
+                        arguments.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, result)
+                        info!!.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments)
+                    }else{
+                        Log.i(TAG, "红外初始化失败")
+                    }
+                    working = !working
+                }
+            }
+            return true
+        }
+
+        return super.onKeyEvent(event)
+
+    }
+        
+        3 配置此服务的属性
+        
+  在res/xml 下新建文件,输入如下内容
+        
+  <accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeWindowStateChanged|typeViewFocused"  //服务监听那些事件,这里是有分类的,在accessibiliyyServiceinfo中
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags="flagRequestFilterKeyEvents"
+    android:canRequestFilterKeyEvents="true"//按键的事件
+    android:canRetrieveWindowContent="true"//读入当前显示窗口的内容
+    android:description="@string/test"//本服务的描述
+    android:packageNames="com.tencent.mm"//配置要监听的应用的包名,只有这些应用的时间才能触发的意思.不写的话就是对全部的应用监听
+    android:notificationTimeout="500" />
+
+在 清单文件中配置
+
+   <service
+            android:name=".BarCodeService"//名字
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">//特殊的权限
+            <intent-filter> //特殊的过滤
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+
+            <meta-data  //指定配置文件
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
+
+用户权限:
+
+   <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
+
+
+
+
+4 在需要的地方开启服务 和启动一般服务是一致的.
+ 
+ 此服务是存在于设置->无障碍下的服务,也可以在这里统一开启
+
+
+5 直接跳转设置界面
+
+6 反射设置开启服务,需要系统级别的权限,系统签名.和用户权限申明.
+
+
+
+
 
 在AccessibilityNoteInfo中实现自动输入时，有两种不同的方法：
 1.在android版本>21时可以使用两种，第一种是AccessibilityService自带的方法：
