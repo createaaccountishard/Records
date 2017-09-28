@@ -1,1 +1,18 @@
 
+在AccessibilityNoteInfo中实现自动输入时，有两种不同的方法：
+1.在android版本>21时可以使用两种，第一种是AccessibilityService自带的方法：
+Bundle arguments = new Bundle();  
+arguments.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, Constents.mobile[mobile_j]);  
+info.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments); 
+
+
+2.第二种是利用粘贴板，这个必须要android版本>18：
+ClipboardManager clipboard = (ClipboardManager)this.getSystemService(Context.CLIPBOARD_SERVICE);  
+ClipData clip = ClipData.newPlainText("text", "15066306736");  
+clipboard.setPrimaryClip(clip);  
+//焦点（n是AccessibilityNodeInfo对象）  
+info.performAction(AccessibilityNodeInfo.ACTION_FOCUS);  
+////粘贴进入内容  
+info.performAction(AccessibilityNodeInfo.ACTION_PASTE);  
+
+再者，对于android版本<18的版本，无法实现对EditText操作。
