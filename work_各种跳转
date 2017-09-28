@@ -1,5 +1,24 @@
-  //打开系统无障碍设置界面
+   1 //打开系统无障碍设置界面
    
    需要用户权限     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
    
                     startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                    
+   反射开启:       
+   
+    需要权限:    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" /> 配合系统签名
+    
+         //注意 这里可能为空（也就是如果当前没有任何一个无障碍服务被授权的时候 就为空了  感谢评论里面指出bug的同学）
+         var enabledServicesSetting = Settings.Secure.getString(
+                context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
+         val selfComponentName = ComponentName("com.hntl.xtjc.barcodehservice",
+                "com.hntl.xtjc.barcodehservice.BarCodeService")
+         val flattenToString = selfComponentName.flattenToString()
+         if (enabledServicesSetting == null || !enabledServicesSetting!!.contains(flattenToString)) {
+            enabledServicesSetting += flattenToString
+        }
+         Settings.Secure.putString(context.contentResolver,
+                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+                enabledServicesSetting)
+         Settings.Secure.putInt(context.contentResolver,
+                Settings.Secure.ACCESSIBILITY_ENABLED, 1)
