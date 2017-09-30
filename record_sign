@@ -1,0 +1,19 @@
+设置在每次签名的时候使用指定的签名文件
+
+在app 下的 build.gradle 中 的android 括号下输入如下
+
+ signingConfigs {
+
+        release {
+            storeFile file('../签名文件名')
+            keyAlias '别名'
+            keyPassword '密码'
+            storePassword '密码'
+        }
+        debug {
+            storeFile file('../***')
+            keyAlias '***'
+            keyPassword '***'
+            storePassword '***'
+        }
+    }
