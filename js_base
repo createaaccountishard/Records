@@ -1,0 +1,5 @@
+1 在页面上输出内容
+document.write(**);                         
+
+2 在标签内输入内容
+document.findElementById(**).innerHTML=**;本质上是在标签中插入内容   <p>**(在这个位置插入的内容)</p>
