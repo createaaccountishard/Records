@@ -75,27 +75,25 @@ ________________________________________________________________________________
 这种规范的 Content-Type就是 multipart/form-data;boundary=${bound},
 其中 ${bound}是定义的分隔符，post body里需要用到,尽量保证随机唯一。
 
-post格式如下:
+格式如下:
 
---${bound}
+请求头
+
+--${bound} 分隔符
 Content-Disposition: form-data; name="Filename"
 Content-Type: application/octet-stream 
 Content-Length: 
 
+content
 --${bound}
 Content-Disposition: form-data; name="file000"; filename="HTTP协议详解.pdf"
 Content-Type: application/octet-stream 
 Content-Length: 
 
+content
 ......
 
-************ 字节数据
-
-************ 字节数据
-
-
-************ 字节数据
---${bound}--
+--${bound}分隔符
 
 
 retrofit2 对 multipart/form-data的封装
