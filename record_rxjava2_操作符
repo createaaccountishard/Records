@@ -1,0 +1,6 @@
+操作符是public 的
+这样每一个observable的实现类都具有继承自父类的全部操作符.
+observable.
+1 create(source)         return RxJavaPlugins.onAssembly(new ObservableCreate<T>(source));
+2 just(item)             return RxJavaPlugins.onAssembly(new ObservableJust<T>(item));
+3 fromArray(T... items)  return RxJavaPlugins.onAssembly(new ObservableFromArray<T>(items));
