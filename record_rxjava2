@@ -1,0 +1,343 @@
+用于记录rxjava2 中源码的实现问题
+被观察者--observable对象
+观察者----observable对象
+
+************************************************************************************
+一  从observable开始
+1 observable 是一个抽象类,实现observableSource接口
+1.1 observable
+ public abstract class Observable<T> implements ObservableSource<T> {
+    
+    /**
+     * 订阅的实际执行者,在调用subscribe方法后内部最终调用此方法
+     * @param observer 观察者对象
+     */
+    protected void subscribeActual(Observer observer) {
+    }
+ }
+ 
+1.1.1  ObservableSource
+public interface ObservableSource<T> {
+
+    /**
+     * 用于订阅的方法
+     */
+    void subscribe(@NonNull Observer<? super T> observer);
+}
+
+结论:当创建一个observable 对象的时候,同时具有subscribe 和subscribeActual 方法.前者会在适当的时候调用后者.
+
+1.2 observable .create(ObservableOnSubscribe<T> source)
+
+1.2.1  调用create 方法的时候需要传入参数:observableOnSubscribe 类,返回一个ObservableCreate 对象
+  
+1.2.2 observableOnSubscribe
+public interface ObservableOnSubscribe<T> {
+
+    /**
+     * 持有一个发射器对象,用来发射数据的
+     */
+    void subscribe(@NonNull ObservableEmitter<T> e) throws Exception;
+}
+1.2.3 ObservableEmitter
+
+public interface ObservableEmitter<T> extends Emitter<T> {
+
+    void setDisposable(@Nullable Disposable d);
+  
+    void setCancellable(@Nullable Cancellable c);
+  
+    boolean isDisposed();
+  
+    ObservableEmitter<T> serialize();
+
+    boolean tryOnError(@NonNull Throwable t);
+  }
+1.2.4 Emitter
+
+  public interface Emitter<T> {
+  
+    void onNext(@NonNull T value);
+
+    void onError(@NonNull Throwable error);
+
+    void onComplete();
+  }
+  1.2.5 create 的内部实现
+  
+  public static <T> Observable<T> create(ObservableOnSubscribe<T> source) {
+        //判断参数是否为null 里面就算是object==null的判断,如果是null,抛出异常
+        ObjectHelper.requireNonNull(source, "source is null");
+        return RxJavaPlugins.onAssembly(new ObservableCreate<T>(source));
+    }
+  1.2.6  RxJavaPlugins.onAssembly
+  
+  public static <T> Observable<T> onAssembly(@NonNull Observable<T> source) {
+        Function<? super Observable, ? extends Observable> f = onObservableAssembly;//这个值是null
+        if (f != null) {
+            return apply(f, source);
+        }
+        return source;//返回的还是传入的ObservableCreate对象
+    }
+  1.2.7 ObservableCreate
+  
+  public final class ObservableCreate<T> extends Observable<T> {  //observableCreate 对象也是一个observable对象
+    final ObservableOnSubscribe<T> source;
+
+    public ObservableCreate(ObservableOnSubscribe<T> source) {//接受参数observableOnSubscribe对象,这个是我们之前new出来的
+        this.source = source;
+    }
+}
+ 结论: 调用create方法,传如observableOnSubscribe 对象,内部调用observableCreate的构造方法,并返回.最终得到一个持有出入obsevableOnSubscribe 的
+ observableCreate 的对象.
+ 
+******************************************************************************************************
+ 不考虑转换符和线程调度的情况下,直接调用observable的subscribe方法
+****************************************************************************************************** 
+
+二 subscribe(observable) 方法
+
+2.1 传入一个新的observable对象,用做观察者
+2.2 内部实现
+
+  public final void subscribe(Observer<? super T> observer) {
+        ObjectHelper.requireNonNull(observer, "observer is null");//判断是否为null
+        try {
+            observer = RxJavaPlugins.onSubscribe(this, observer);//一般情况下,这个observable对象和我们传入的是一致的
+            ObjectHelper.requireNonNull(observer, "Plugin returned null Observer");
+           
+           subscribeActual(observer);//真实的调用 subscribeActual ,observal 
+        } catch (NullPointerException e) { // NOPMD
+            throw e;
+        } catch (Throwable e) {
+            Exceptions.throwIfFatal(e);
+            // can't call onError because no way to know if a Disposable has been set or not
+            // can't call onSubscribe because the call might have set a Subscription already
+            RxJavaPlugins.onError(e);
+
+            NullPointerException npe = new NullPointerException("Actually not, but can't throw other exceptions due to RS");
+            npe.initCause(e);
+            throw npe;
+        }
+    }
+2.3  RxJavaPlugins.onSubscribe
+
+   public static <T> Observer<? super T> onSubscribe(@NonNull Observable<T> source, @NonNull Observer<? super T> observer) {
+        BiFunction<? super Observable, ? super Observer, ? extends Observer> f = onObservableSubscribe;//这个是null
+        if (f != null) {
+            return apply(f, source, observer);
+        }
+        return observer;//返回我们传入的observable
+    }
+2.4 Observable.subscribeActual(observer)
+
+    protected void subscribeActual(Observer<? super T> observer) {
+        //这个发射器实现了好多的接口
+        //static final class CreateEmitter<T> extends AtomicReference<Disposable> implements ObservableEmitter<T>, Disposable
+        CreateEmitter<T> parent = new CreateEmitter<T>(observer);//创建发射器,传入观察者
+        observer.onSubscribe(parent);//调用观察者onSubscribe的方法,传入parent,这里是当作Disposable对象的
+        try {                        // source-是之前创建observable对象的时候我们new 的observableOnSubscrble对象
+            source.subscribe(parent);//核心,被观察开始获得发射器,发射器将事件进行发送给观察者
+        } catch (Throwable ex) {//最高的异常,可抛性
+            Exceptions.throwIfFatal(ex);
+            parent.onError(ex);//如果发生中发生异常,调用发射器的onerror()方法.
+        }
+    }
+    
+2.5  CreateEmitter 对象  它是一个静态内部类
+
+  static final class CreateEmitter<T> extends AtomicReference<Disposable> implements ObservableEmitter<T>, Disposable {
+        private static final long serialVersionUID = -3434801548987643227L;
+        final Observer<? super T> observer;
+
+        CreateEmitter(Observer<? super T> observer) {//持有的观察者对象
+            this.observer = observer;
+        }
+        
+        @Override
+        public void onNext(T t) {
+            if (t == null) {
+                onError(new NullPointerException("onNext called with null. Null values are generally not allowed in 2.x operators and sources."));
+                return;
+            }
+            if (!isDisposed()) {//未被取消的情况下
+                observer.onNext(t);//调用观察这的onnext方法,实现重被观察者向观察者发送事件,后面的同样是这样处理
+            }
+        }
+
+        @Override
+        public void onError(Throwable t) {
+            if (!tryOnError(t)) {
+                RxJavaPlugins.onError(t);
+            }
+        }
+
+        @Override
+        public boolean tryOnError(Throwable t) {
+            if (t == null) {
+                t = new NullPointerException("onError called with null. Null values are generally not allowed in 2.x operators and sources.");
+            }
+            if (!isDisposed()) {
+                try {
+                    observer.onError(t);
+                } finally {
+                    dispose();
+                }
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public void onComplete() {
+            if (!isDisposed()) {
+                try {
+                    observer.onComplete();
+                } finally {
+                    dispose();
+                }
+            }
+        }
+
+        @Override
+        public void setDisposable(Disposable d) {
+            DisposableHelper.set(this, d);
+        }
+
+        @Override
+        public void setCancellable(Cancellable c) {
+            setDisposable(new CancellableDisposable(c));
+        }
+
+        @Override
+        public ObservableEmitter<T> serialize() {
+            return new SerializedEmitter<T>(this);
+        }
+        //取消订阅的方法
+        @Override
+        public void dispose() {
+            DisposableHelper.dispose(this);
+        }
+
+        @Override
+        public boolean isDisposed() {
+            return DisposableHelper.isDisposed(get());
+        }
+    }
+    
+    2.6 DisposableHelper 这个是个枚举类
+
+    public enum DisposableHelper implements Disposable {
+    /**
+     * The singleton instance representing a terminal, disposed state, don't leak it.
+     */
+    DISPOSED;
+
+    public static boolean isDisposed(Disposable d) {
+        return d == DISPOSED;
+    }
+
+    public static boolean set(AtomicReference<Disposable> field, Disposable d) {
+        for (;;) {
+            Disposable current = field.get();
+            if (current == DISPOSED) {
+                if (d != null) {
+                    d.dispose();
+                }
+                return false;
+            }
+            if (field.compareAndSet(current, d)) {
+                if (current != null) {
+                    current.dispose();
+                }
+                return true;
+            }
+        }
+    }
+
+    public static boolean setOnce(AtomicReference<Disposable> field, Disposable d) {
+        ObjectHelper.requireNonNull(d, "d is null");
+        if (!field.compareAndSet(null, d)) {
+            d.dispose();
+            if (field.get() != DISPOSED) {
+                reportDisposableSet();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean replace(AtomicReference<Disposable> field, Disposable d) {
+        for (;;) {
+            Disposable current = field.get();
+            if (current == DISPOSED) {
+                if (d != null) {
+                    d.dispose();
+                }
+                return false;
+            }
+            if (field.compareAndSet(current, d)) {
+                return true;
+            }
+        }
+    }
+
+    public static boolean dispose(AtomicReference<Disposable> field) {
+        Disposable current = field.get();
+        Disposable d = DISPOSED;
+        if (current != d) {
+            current = field.getAndSet(d);
+            if (current != d) {
+                if (current != null) {
+                    current.dispose();
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean validate(Disposable current, Disposable next) {
+        if (next == null) {
+            RxJavaPlugins.onError(new NullPointerException("next is null"));
+            return false;
+        }
+        if (current != null) {
+            next.dispose();
+            reportDisposableSet();
+            return false;
+        }
+        return true;
+    }
+
+    public static void reportDisposableSet() {
+        RxJavaPlugins.onError(new ProtocolViolationException("Disposable already set!"));
+    }
+
+    public static boolean trySet(AtomicReference<Disposable> field, Disposable d) {
+        if (!field.compareAndSet(null, d)) {
+            if (field.get() == DISPOSED) {
+                d.dispose();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void dispose() {
+        // deliberately no-op
+    }
+
+    @Override
+    public boolean isDisposed() {
+        return true;
+    }
+}
+
+结论: 在调用create 方法产生observable的时候,获得了一个根据方法名返回observable实现类的对象
+      在调用subscribe方法时,传入观察者,内部会产生一个发射器并持有观察者,然后会调用被观察者observable的subscribe方法
+      其实是使用了2个observable对象来处理信息的传递.中间使用其他类进行转化.但都是observable的子类.
+      
+      被观察者拿着发生器产生数据,发射器持有观察者,在发射数据的时候,直接调用观察者方法,就收到了数据.这是最简单的一中实现.
+
