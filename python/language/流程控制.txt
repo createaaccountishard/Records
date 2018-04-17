@@ -1,0 +1,28 @@
+1 判断
+
+if  表达式1 :
+	suite
+elif 表达式2:
+	suite
+else:
+	pass
+ 
+
+2 循环
+
+while 表达式:
+	suite
+
+
+for a in  迭代体:
+	suite
+
+
+3异常
+
+
+try:
+     suite
+except 异常名称 as a:        a是这个异常的引用,可在suite中是使用
+     suite
+

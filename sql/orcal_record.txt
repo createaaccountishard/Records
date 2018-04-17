@@ -1,0 +1,16 @@
+orcal的 测试用数据库
+
+全局名称: orcal_test
+
+管理员密码: WSYhavetime_123
+
+名称: SYS  /  SYSTEM
+
+监听端口:
+
+端口对应的服务:
+
+
+product code： 4vkjwhfeh3ufnqnmpr9brvcuyujrx3n3le 
+serial Number：226959 
+password: xs374ca

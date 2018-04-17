@@ -1,0 +1,36 @@
+
+使用cygwin 
+
+1 官网下载cygwin 安装器
+
+2 安装到指定盘符,保留安装器
+
+3 添加安装目录的bin文件夹到系统环境变量
+
+
+4下载c语言的编译器, devel 下的 
+
+手动下载的: gcc-g++,gdb, cmake,make,
+
+自动的:libstdc,
+
+
+项目编译器: clion
+
+使用授权服务器进行认证
+
+1 在settings 的界面找到buid->toolchains
+
+2 环境选择 cygwin,选择目录到上面安装的根目录(window的安装目录) E:\cygwin
+
+3 cmake 选择,上面安装目录bin下的cmake.exe                      E:\cygwin\bin\cmake.exe
+
+4 make,  \usr\bin\make.exe
+  c,     \usr\bin\gcc.exe
+  c++,   \usr\bin\c++.exe
+5 需要设置5项,2,3,4中的内容
+
+备注: cygwin的目录和windows的目录不一致的, 
+cygwin下载的可执行程序,被映射成/usr/bin 下了
+
+

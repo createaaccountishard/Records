@@ -1,0 +1,29 @@
+
+使用gson 解析泛型的实体类
+
+1 泛型相关的语言知识请查看java language 下的 type 接口相关
+
+2 gson提供了TyptToken的封装类来接收传入的含有泛型的类.
+
+
+for example
+
+
+class Test<T> {
+
+List aList<T>;
+
+}
+
+
+
+解析过程
+
+new Gson.fromJson("",new TypeToken<Test<Bean>>(){}.getType())
+
+
+分析:
+
+1 通过封装的实体类typeToken 的getType 函数, 
+	gson 能正确的收到解析时参考的类.//收到的是Test<Bean>
+2 在其构造函数内部,通过class对象获得了声明时传入的泛型对象,然后分析记录在字段上.

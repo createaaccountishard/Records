@@ -1,0 +1,32 @@
+1 adb 的多个设备连接的指令
+adb -d/-e/-s 序列号  command
+
+-d  指定唯一通过usb连接的设备
+-e  指定唯一通过模拟器连接的设备
+-s 序列号  通过指定序列号连接设备
+
+2
+获得设备的序列号 
+adb devices
+
+3
+开启adb服务/关闭adb服务, 一般情况下此服务在设备连接时自动开启.
+在指定的端口上运行服务
+adb start-server
+adb kill-server 
+adb -p <port> start-server
+
+4 
+adb 的版本
+adb version
+
+5
+连接到android系统的内核终端,相当于控制pc的控制台
+adb shell 
+
+6
+包管理器
+pm  package manager ;
+
+adb shell pm list packages 
+

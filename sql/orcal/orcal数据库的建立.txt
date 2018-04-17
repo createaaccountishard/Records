@@ -1,0 +1,95 @@
+1 首先安装orcal的应用,此时最好选择不安装数据库实例.
+
+2 数据库和应用最好分开位置存放
+
+3 安装数据库实例. 需要记下设置的数据库全局名称,登录密码.
+
+4 默认有2个系统登入
+  
+  sys,密码;
+  system,密码.
+
+5 安装完成数据库实例后,会自动配置一个监听器.我们需要再配置一个对应的监听服务.(本地net服务)
+
+或者删除上述的监听,自己设置.
+
+6 每一个数据库实例,至少需要一对监听和对应的服务.
+
+7 这些服务可以在数据库产品的目录下找到.
+
+例如: 我的orcal 产品是安装在
+
+E:\orcal_database\product\12.2.0\dbhome_1  // product后 是数据库的应用,数据库文件在另一个位置
+.
+
+监听和服务在:
+
+E:\orcal_database\product\12.2.0\dbhome_1\network\admin\目录下
+
+listener.ora 是监听,tnsnames.ora 是对应的服务
+
+可以使用
+
+tnsping 设置的服务名来检测服务是否开启.
+
+例如:
+
+C:\Users\无限剑制>tnsping orcal_test_server
+
+TNS Ping Utility for 64-bit Windows: Version 12.2.0.1.0 - Production on 29-1月 -2018 09:27:17
+
+Copyright (c) 1997, 2016, Oracle.  All rights reserved.
+
+已使用的参数文件:
+E:\orcal_database\product\12.2.0\dbhome_1\network\admin\sqlnet.ora
+
+
+已使用 TNSNAMES 适配器来解析别名
+尝试连接 (DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 127.0.0.1)(PORT = 1521))) (CONNECT_DATA = (SERVICE_NAME = orcal_test)))
+OK (20 毫秒)
+
+
+问题记录:
+
+安装完成后如果有问题则需要查看上述的2个文件
+
+1 监听是否完整
+
+ADR_BASE_ORCALTESTLISTENER = E:\orcal_database\product\12.2.0\dbhome_1\log
+
+ORCALTESTLISTENER =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = Arcueid)(PORT = 1521))
+  )
+
+SID_LIST_ORCALTESTLISTENER =
+  (SID_LIST =
+    (SID_DESC =
+      (SID_NAME = CLRExtProc)
+      (ORACLE_HOME = E:\orcal_database\product\12.2.0\dbhome_1)
+      (PROGRAM = extproc)
+      (ENVS = "EXTPROC_DLLS=ONLY:E:\orcal_database\product\12.2.0\dbhome_1\bin\oraclr12.dll")
+    )
+    (SID_DESC =  //这里的部分是监听使用的配置,对应的全局数据库名称,orcal产品目录
+      (GLOBAL_DBNAME = orcal_test)
+      (ORACLE_HOME = E:\orcal_database\product\12.2.0\dbhome_1)
+      (SID_NAME = ORCL)//默认的
+    )
+  )
+
+
+2 服务指向哪个监听和数据库.
+
+
+ORCAL_TEST_SERVER =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 127.0.0.1)(PORT = 1521))//数据库的主机
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = orcal_test)//连接的数据库全局名称
+    )
+  )
+
+LISTENER_ORCALTEST =
+  (ADDRESS = (PROTOCOL = TCP)(HOST = Arcueid)(PORT = 1521))//使用的监听

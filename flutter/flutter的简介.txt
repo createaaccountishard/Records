@@ -1,0 +1,11 @@
+flutter 简介
+
+简单来说是谷歌推出的跨android ios 的统一应用开发程序. 类似react-native.
+
+在android studio 上加载flutter插件.
+flutter 使用的sdk在没法从网上下载的时候,使用github上提供的.
+具体就是clone github上的fluuter .在创建项目的时候设置
+
+flutter sdk path:
+
+E:\studio\fluttersdk\flutter (这里是我从github上clone来的 flutter项目,指向clone的最高文件夹 )

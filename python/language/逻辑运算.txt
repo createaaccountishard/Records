@@ -1,0 +1,19 @@
+
+1 and  or   not
+
+5 and 2        返回的是2  
+1 and 2 and 3  返回的是3
+
+1 or 2         返回的是1
+1 or 2 or 3    返回的是1
+
+not 1          返回 false
+not 0          返回 true
+
+0   是  false
+
+非0 是  true
+
+
+
+在布尔的上下文中会返回布尔
