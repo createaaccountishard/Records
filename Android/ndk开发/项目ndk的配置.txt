@@ -1,0 +1,82 @@
+ndk 的配置工作
+
+
+1 使用as创建c/c++的代码需要有前提条件
+
+下载 ndk 包        :编译c/c++  
+下载外部构脚本工具 :默认的构建脚本cmake, 也可使用ndk_build 构建脚本(这个需要Android.mk 文件或者 Application.mk文件)
+下载lldb           :as 用于调试原生代码
+
+这写的下载使用as自带的sdkmanager进行下载就行.
+
+
+2 创建项目的支持
+
+2.1 是新建一个支持c的项目,在配置中选择好
+2.2 是手动配置c的内容,过程是参考新建的项目,例如:
+ 
+    和java同级别的cpp文件安夹;
+    在模块项目下的CMakeLists.txt
+    配置gradle中的支持
+
+
+
+3 以下是对现有项目添加的手动配置
+
+3.1 c文件目录
+
+  在模块(app或者module)main目录下新建目录 cpp(可以是其他的名字); cpp目录中存放的是c/c++的源文件,内部可以是多文件结构
+ 
+3.2 外部的编译脚本 CMakeLists.txt
+  
+  在模块(app或者module)的根目录下新建指定名称的CMakeLists.txt文件. 内部是脚本的内容,这里就不讨论了.
+
+3.3 配置gradle,使它能够调用外部的脚本构建器
+
+  在对应模块的gradle中配置执行3.2中的路径
+
+android {
+    compileSdkVersion 26
+    defaultConfig {
+        applicationId "com.imoon.learn.testshaoyang"
+        minSdkVersion 19
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+         // 这里的是一部分
+	 externalNativeBuild {
+            cmake {
+                cppFlags "-frtti -fexceptions"  //这里的值,也许可以更改
+            }
+        }
+	 // 以上
+
+       	  //编译在哪个CPU平台上,不添加表示编译所有的平台,defaultConfig下
+	  ndk {  
+          abiFilters 'armeabi-v7a' , 'arm64-v8a', 'x86', 'x86_64'
+         }
+
+	  //指定其他so的文件路径,这里是放在了模块的lib下,defaultConfig下
+          //也可以是main目录下的jinLibs目录,使用它就不需要配置下面的语句了
+	  
+	   sourceSets.main {  
+          jniLibs.srcDir 'libs'  // 相对路径,在模块下,可以换其他的
+         }  
+  		
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    // 这里是第二部分
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"// 这里是文件的相对路径,也许可以更改
+        }
+    }
+    // 以上
+}
+ 	

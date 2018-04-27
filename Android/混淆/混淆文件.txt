@@ -1,0 +1,252 @@
+# Add project specific ProGuard rules here.
+# You can control the set of applied configuration files using the
+# proguardFiles setting in build.gradle.
+#
+# For more details, see
+#   http://developer.android.com/guide/developing/tools/proguard.html
+
+# If your project uses WebView with JS, uncomment the following
+# and specify the fully qualified class name to the JavaScript interface
+# class:
+#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
+#   public *;
+#}
+
+# Uncomment this to preserve the line number information for
+# debugging stack traces.
+#-keepattributes SourceFile,LineNumberTable
+
+# If you keep the line number information, uncomment this to
+# hide the original source file name.
+#-renamesourcefileattribute SourceFile
+
+
+##########################################################################
+# 三个基本功能
+
+#关闭压缩(非使用的资源会在打包时被删除,可以减小app的体积)
+-dontshrink
+
+# 关闭优化(在字节码上,由系统进行优化)
+-dontoptimize
+
+# 关闭混淆(类和类成员会被随机命名,除非用keep保护)
+# 此处注释表示开启混淆
+# 混淆后默认会在工程目录app/build/outputs/mapping/release下生成一个mapping.txt文件，
+# 这就是混淆规则
+#-dontobfuscate
+
+##########################################################################
+
+
+
+
+##########################################################################
+# 常用设置
+
+#忽略警告信息
+-ignorewarnings
+
+#指定代码的压缩级别 0-7
+-optimizationpasses 5
+
+#混淆后都是小写字母名
+-dontusemixedcaseclassnames
+
+#不去忽略非公共的库类(非公共库也要混淆)
+-dontskipnonpubliclibraryclasses
+-dontskipnonpubliclibraryclassmembers
+
+#混淆时不记录日志
+-verbose
+
+#不优化输入的类文件(注释后表示优化)
+-dontoptimize
+
+#不做预校验
+-dontpreverify
+
+#混淆采用的算法.
+-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
+
+# 保留系统自带的一些内容 【例如：-keepattributes *Annotation* 会保留Activity的被@override注释的onCreate、onDestroy方法等】
+-keepattributes Exceptions,InnerClasses,Deprecated,*Annotation*,EnclosingMethod
+
+# 避免混淆泛型
+-keepattributes Signature
+
+# 抛出异常时保留代码行号,保持源文件以及行号
+-keepattributes SourceFile,LineNumberTable
+
+# 保持 native 方法不被混淆,涉及c,c++
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+
+#不提示V4包下错误警告
+-dontwarn android.support.v4.**
+-dontwarn android.annotation
+#保持下面的V4兼容包的类不被混淆
+-keep class android.support.v4.**{*;}
+
+-keep public class * extends android.app.Activity
+-keep public class * extends android.app.Application
+-keep public class * extends android.app.Service
+-keep public class * extends android.content.BroadcastReceiver
+-keep public class * extends android.content.ContentProvider
+-keep public class * extends android.app.backup.BackupAgentHelper
+-keep public class * extends android.preference.Preference
+-keep public class com.android.vending.licensing.ILicensingService
+-keep public class * extends android.support.v4.app.Fragment
+
+#避免混淆自定义控件类的get/set方法和构造函数
+-keep public class * extends android.view.View{
+        *** get*();
+        void set*(***);
+        public <init>(android.content.Context);
+        public <init>(android.content.Context,android.util.AttributeSet);
+        public <init>(android.content.Context,android.util.AttributeSet,int);
+}
+#避免混淆枚举类
+-keepclassmembers enum * {
+        public static **[] values();
+        public static ** valueOf(java.lang.String);
+}
+
+#不混淆Parcelable和它的实现子类，还有Creator成员变量
+    -keep class * implements android.os.Parcelable {
+      public static final android.os.Parcelable$Creator *;
+    }
+
+#不混淆Serializable和它的实现子类、其成员变量
+    -keepclassmembers class * implements java.io.Serializable {
+        static final long serialVersionUID;
+        private static final java.io.ObjectStreamField[] serialPersistentFields;
+        private void writeObject(java.io.ObjectOutputStream);
+        private void readObject(java.io.ObjectInputStream);
+        java.lang.Object writeReplace();
+        java.lang.Object readResolve();
+    }
+
+#使用GSON、fastjson等框架时，所写的JSON对象类不混淆，否则无法将JSON解析成对应的对象
+    -keepclassmembers class * {
+        public <init>(org.json.JSONObject);
+    }
+
+ #避免混淆属性动画兼容库
+    -dontwarn com.nineoldandroids.*
+    -keep class com.nineoldandroids.** { *;}
+
+
+#避免混淆js相关的接口
+-keepattributes *JavascriptInterface*
+-keep class com.wyk.test.js.** { *; }
+
+##########################################################################
+
+
+##########################################################################
+#第三方库类
+
+
+
+
+
+##########################################################################
+
+
+
+
+
+##########################################################################
+# 混淆引入的jar
+
+#-libraryjars libs/umeng-analytics-v5.2.4.jar
+#-libraryjars libs/alipaysdk.jar
+#-libraryjars libs/alipaysecsdk.jar
+#-libraryjars libs/alipayutdid.jar
+#-libraryjars libs/wup-1.0.0-SNAPSHOT.jar
+#-libraryjars libs/weibosdkcore.jar
+
+
+
+
+
+##########################################################################
+
+
+
+
+
+
+
+##########################################################################
+# 避免混淆你的实体类
+
+# 保留此包下的类名不混淆,其二级往下的依旧会被混淆(1个星),但内部内容会混淆
+-keep class  com.imoon.learn.testdexlib.*
+
+# 保留此包和此包下的全部类的名字不混淆(2个星),但内部内容会混淆
+-keep class  com.imoon.learn.testdexlib.**
+
+# 保留指定类和类中的全部内容不混淆
+#-keep class com.imoon.learn.testdexlib.ITestDex{*;}
+
+# 保留指定类中的public  private 的方法不混淆
+#-keep class  com.imoon.learn.testdexlib.TestDex{
+# public <methods>; 方法
+# public  <init> 构造函数
+# }
+
+
+# 不混淆某个类的特定的方法
+# -keepclassmembers class name.huihui.example.Test {
+#      public void test(java.lang.String);
+# }
+#
+#
+#-keep class name.huihui.example.Test$* {
+#       *;
+# }
+
+##########################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+##########################################################################
+# 记录混淆时的对应关系,列出在指定的文件中
+# 文件在各个项目的build/outputs/mapping中
+
+# 列出 apk 包内所有 class 的内部结构
+-dump class_files.txt
+
+# 列出从apk中删除的代码
+-printusage unused.txt
+
+# 列出混淆前后的映射
+-printmapping mapping.txt
+
+# 列出未混淆的类和成员
+-printseeds seeds.txt
+
+##########################################################################
+
+
+
+
+
+
+
+
+
+
+
