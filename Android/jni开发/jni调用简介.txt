@@ -1,0 +1,13 @@
+
+
+1 jni   java native interface
+
+  本质上是调用so库中的方法
+
+2 jni 是1个中间层,用来连接java 和c/c++
+
+
+3 使用jni从java 进入c, 再调用c的相关内容,完成后返回java
+
+
+4 c/c++ 源码经过编译后变成可以使用的so文件,其中包换了调用的jni实现

@@ -1,0 +1,41 @@
+
+1 创建  这里先保证java的文件可以调用, 后续在说明kotlin 的使用
+
+  在java的源码中创建含有native 方法的类, 类中使用 
+    
+
+ class 类名
+
+   static{
+     system.loadLibrary("so库名称")
+   }
+
+
+  public static native  返回值  方法名  (形参);
+
+
+
+2 生成头文件
+
+
+  使用javah 命令生成对应的头文件,文件名称可以随意指定
+
+  需要在项目的java的路径下调用
+
+  javah  -classpath . -jni -o 输出目录
+
+  例如:javah.exe -classpath . -jni -o D:\work_space_64\test\TestShaoyang\app\src\main\jni\test
+
+
+3 简单的使用方法
+
+  使用as提供的extern tool 进行自动生成
+
+
+4 编写头文件的实现
+
+   这里就是c的开发了,记得完成后使用return 返回值
+
+5 配置
+
+  在cmakelists.txt文件中 配置c源码编译后的库. 和ndk中的设置是一样的

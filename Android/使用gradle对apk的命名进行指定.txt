@@ -1,0 +1,15 @@
+//打包命名
+
+    def today = new Date().format("yy_MM_dd")
+    applicationVariants.all { variant ->
+        
+        variant.outputs.all {
+            //定义为自己的项目
+            def  projectName="testshaoyang"
+            def name = variant.flavorName
+            def buildType = variant.buildType.name
+            def versionName = variant.versionName
+            def allName = projectName + name + "_" + today + "_" + buildType + "_" + versionName + ".apk"
+            outputFileName = allName
+        }
+    }

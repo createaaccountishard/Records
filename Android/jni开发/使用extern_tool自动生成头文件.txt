@@ -1,0 +1,17 @@
+
+1 在as的settting中找到extern tool  
+
+2 点击添加
+
+3 起个名字例如  javah_create_c_h  ,指定该命令在的组名 例如 jni
+
+4 配置javah 命令的参数
+
+  // 执行javah的所在位置
+  Program:   $JDKPath$\bin\javah.exe
+  // 命令用到的参数, 将指定目录下的文件生成jni 输出在自动目录  
+  Parameters:  -classpath . -jni -o $ModuleFileDir$/src/main/jni/$Prompt$ $FileClass$ 
+  //命令运行的工作空间,就是在项目的java下执行 上面的命令
+  Working directory: $ModuleFileDir$\src\main\java
+
+5 保存

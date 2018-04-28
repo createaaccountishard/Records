@@ -1,0 +1,49 @@
+
+1 flavor简介
+
+ as 提供的flavor可以看作是git版本的一种实现
+
+ 实际上src/main  main 就是默认的flavor
+
+ 打包的内容: main下的源文件和指定flavor下的文件
+
+2 创建flavor
+
+  在模块的build.gradle 文件中;
+  在android 的大括号内,
+  // 产生风味
+
+  // 在gradle 3.0 以上需要声明风味的大类   
+  
+  flavorDimensions("isFree","channel")   // 这里产生了2个大类,最后可能产生 isfree 的种类 * channel 的种类个apk
+                                         // 例如免费 不免费  ; google渠道,百度渠道  ->2*2=4;  
+  使用productFlavor{
+   
+    // 在这里声明每一种flavor,它的配置也可以在项目的project structure中的flavor选项卡中配置
+    free{
+       
+      // 如果什么也不写,就使用和main中同样的默认配置
+      // 这里的id会在选中此flavor时替换main中的id,即更换了包名
+      applicationId 'com.imoon.learn.testshaoyang.a'
+
+      sourceSet.free{ 
+                res.srcDir("src/main/res") // 指定res的资源, 参数是可变参数,可以指定多个路径,用,隔开
+                java.srcDirs()             //同上
+                            }
+
+
+     }	
+    nofree{
+     }
+
+    googlec{
+    
+    }
+
+    baiduc{
+   
+    }
+
+
+
+   }

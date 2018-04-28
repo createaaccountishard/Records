@@ -1,0 +1,47 @@
+
+1 配置渠道
+
+
+使用productFlavor{
+   
+    // 在这里声明每一种flavor,它的配置也可以在项目的project structure中的flavor选项卡中配置
+    free{
+       
+      // 如果什么也不写,就使用和main中同样的默认配置
+      // 这里的id会在选中此flavor时替换main中的id,即更换了包名
+      applicationId 'com.imoon.learn.testshaoyang.a'
+
+      sourceSet.free{ 
+                res.srcDir("src/main/res") // 指定res的资源, 参数是可变参数,可以指定多个路径,用,隔开
+                java.srcDirs()             //同上
+                            }
+
+       // 这里的是打多个包的重点
+       // morechannel 是manifes中mete-data 中value中的占位变量
+       // manifest中mete-data 中的名字可以随便起
+       // 冒号 后面的是对应的值
+       manifestPlaceholders=[morechannel:"1"] // manifes的占位符号,可以将manifest中mete-data中的值替代为指定值
+
+     }	
+    nofree{
+     }
+
+    googlec{
+    
+    }
+
+    baiduc{
+   
+    }
+
+   }
+
+2 配置manifest
+
+  在application 中使用mete-data 标签
+
+      <meta-data
+            android:name="channel" // 名称可以随便写
+            android:value="${morechannel}" /> // 这里的morenchannel 是占位符,会被grade中的同变量名的值代替
+
+3 使用build 中的signed apk 选中所有的渠道,最终会产生多个包

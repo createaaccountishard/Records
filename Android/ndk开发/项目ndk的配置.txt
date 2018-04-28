@@ -31,9 +31,11 @@ ndk 的配置工作
   
   在模块(app或者module)的根目录下新建指定名称的CMakeLists.txt文件. 内部是脚本的内容,这里就不讨论了.
 
-3.3 配置gradle,使它能够调用外部的脚本构建器
+3.3 配置gradle,使它能够调用外部的脚本构建器,也可一在android的视图下通过右键链接c库,需要指定前面配置好的cmakelists文件
 
   在对应模块的gradle中配置执行3.2中的路径
+
+以下为手动配置
 
 android {
     compileSdkVersion 26

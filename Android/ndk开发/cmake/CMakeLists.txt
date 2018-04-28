@@ -1,6 +1,6 @@
 # For more information about using CMake with Android Studio, read the
-# documentation: https://d.android.com/studio/projects/add-native-code.html
-
+# documentation:
+# https://developer.android.google.cn/studio/projects/add-native-code#new-project
 
 #########################################################################
 #  一
@@ -51,8 +51,10 @@ include_directories(src/main/c/)
 
 ############################################################################
 #  四
-# 使用ndk中已经存在的库/或者说是导入其他库
-# 这里找到指定库并重命名了,并未链接到其他的库中
+# 使用ndk中已经存在的库/或者说是导入其他库,这里找到指定库并重命名了,并未链接到其他的库中.
+# NDK 还以源代码的形式包含一些库，在构建和关联到您的原生库时需要使用这些代码
+# 可以使用 add_library() ，将源代码编译到原生库中。要提供本地 NDK 库的路径，
+# 可以使用 ANDROID_NDK 路径变量，Android Studio 会自动为您定义此变量.
 # 使用find_library() 函数
 # 函数2个参数
 # 1 自定义的库名称  2 想要cmake加载ndk中定义好的库名称(这个是已经事先存在的)
@@ -67,6 +69,10 @@ include_directories(src/main/c/)
 # 这里的log-lib 是一个存储了log的路径变量,供后续的target_link_libraries()函数使用
 find_library(log-lib log)
 
+# 源码的事例
+add_library( app-glue
+             STATIC
+             ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c )
 
 ############################################################################
 #  五
@@ -81,13 +87,28 @@ find_library(log-lib log)
 # build script, prebuilt third-party libraries, or system libraries.
 ############################################################################
 
-# 此处${} 的不能去掉
+# 此处${} 的不能去掉,表示使用的是log-lib 这个变量的值
 target_link_libraries(testgo ${log-lib} )
 
+target_link_libraries( testgo app-glue  )
+
 
 ############################################################################
-#
-#
-#
-#
+# 六 添加其他预构建库
+#    添加预构建库与为 CMake 指定要构建的另一个原生库类似。
+#    由于库已经预先构建，需要使用 IMPORTED 标志告知 CMake 只希望将库导入到项目中
+#    然后，需要使用 set_target_properties() 命令指定库的路径
+#    为了确保可以在编译时定位您的标头文件，需要使用 include_directories()包含标头文件的路径
+#    要将预构建库关联到您自己的原生库，请将其添加到 CMake 构建脚本的 target_link_libraries()
 ############################################################################
+
+#add_library( imported-lib
+#             SHARED
+#             IMPORTED )   # 只是导入
+
+#set_target_properties(imported-lib
+#                       PROPERTIES IMPORTED_LOCATION          # 属性,导入路径
+#                       imported-lib/src/${ANDROID_ABI}/libimported-lib.so )
+
+#include_directories( imported-lib/include/ )
+#target_link_libraries(testgo imported-lib  )
