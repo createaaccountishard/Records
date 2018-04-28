@@ -1,0 +1,14 @@
+cmake_minimum_required(VERSION 3.6) // 指定使用cmake的最低版本,可以变的
+
+#set(CMAKE_CXX_STANDARD 17)// 此行自动生成的,暂时不知道原因,需要注释掉
+
+
+// 这两行是配置编译器的环境,因为在setttings中配置了,这里的就注释了
+#set(CMAKE_C_COMPILER  "/usr/bin/gcc" )
+#set(CMAKE_CXX_COMPILER "/usr/bin/c++")
+
+
+
+//后面的是自动生成的
+project(cTest)
+add_executable(cTest main.cpp)
