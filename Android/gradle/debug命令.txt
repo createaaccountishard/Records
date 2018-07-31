@@ -1,0 +1,3 @@
+gradlew processDebugResources --debug
+
+debug 确定错误用   从结果中搜索 error

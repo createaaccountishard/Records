@@ -1,0 +1,41 @@
+1问题
+跨域问题来源于JavaScript的同源策略：
+即只有 协议+主机名+端口号 (如存在)相同，则允许相互访问。
+也就是说JavaScript只能访问和操作自己域下的资源，不能访问和操作其他域下的资源。
+
+跨域问题是针对JS和ajax的，html本身没有跨域问题，
+比如a标签、script标签、甚至form标签（可以直接跨域发送数据并接收数据）.
+
+2解决
+可以再前端进行解决也可以再后端进行解决
+
+2.1
+JSONP 前端方式，还包括后端配合解决
+
+JSONP是JSON with Padding的略称。
+它是一个非官方的协议，它允许在服务器端集成Script tags返回至客户端，
+通过javascript callback的形式实现跨域访问（这仅仅是JSONP简单的实现形式）。
+关于jsonp的使用方式，可以参考http://blog.csdn.net/alen1985/article/details/6365394，
+优缺点可以参考http://blog.csdn.net/z69183787/article/details/19191385
+
+简单理解： json 传递了1个默认的callback 参数，它可以理解成是访问成功后用以回掉的函数，需要
+服务端向使用方法调用一样使用，将返回的数据以参数的形式传递。
+
+callback（参数）;
+
+callbakc 解析得到sting 类型，使用如下 callback+“（“+返回的数据 +” ）”
+
+当然了可以再前端对callback 自定义名称，后端使用定义好的名称
+
+2.2 后端方式，不需要前端配合
+
+添加响应头，允许跨域 
+　　addHeader(‘Access-Control-Allow-Origin:*’);//允许所有来源访问 
+    或者
+　　addHeader(‘Access-Control-Allow-Method:POST,GET’);//允许访问的方式
+
+简单解释： 使用上述方式即可。 本质上是让浏览器不对响应做同源判断处理。
+
+
+参照博客：
+https://blog.csdn.net/u014727260/article/details/72793459

@@ -1,0 +1,15 @@
+在电脑术语中，统一资源标识符（英语：Uniform Resource Identifier，或URI）是一个用于标识某一互联网资源名称的字符串。
+
+
+通用URI的格式如下：
+
+ scheme:[//[user[:password]@]host[:port]][/path][?query][#fragment]
+
+
+                    hierarchical part
+        ┌───────────────────┴─────────────────────┐
+                    authority               path
+        ┌───────────────┴───────────────┐┌───┴────┐
+  abc://username:password@example.com:123/path/data?key=value&key2=value2#fragid1
+  └┬┘   └───────┬───────┘ └────┬────┘ └┬┘          
+scheme  user information     host     port                  query         fragment
