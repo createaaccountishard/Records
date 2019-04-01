@@ -1,0 +1,4 @@
+1 只有1个manifest 的标签，根标签
+2 1中只有1个application的标签
+3 2中有多个activity service recevier provider
+

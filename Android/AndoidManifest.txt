@@ -1,9 +1,0 @@
-1 只有1个manifest 的标签
-2 只有1个application的标签
-3 有多个activity service recevier provider
-4 intent-filter 只存在activity service receiver 中，可以有多个
-
-5 intent-filter 中有3类，action  category  data 
-6 action 是意图，可以用标准的，可以自定义
-7 category 是类别
-8 data 是uri的定义，多个data 可以组成一个，最终组成的是1个uri

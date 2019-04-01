@@ -1,0 +1,21 @@
+1 两者没有任何关系
+2 默认情况下和packager的值一样，当然也也可以设置的不一样
+3 意义是：
+  package： 软件包名，命令空间，路径等
+  applicationId: 应用id，类似于商品的唯一id， 在发布后不应该更改，否则商店认为是不同的商品。
+
+4 特殊点：
+  两者的值可以相同，可以不相同
+ 
+  applicationId的命名需要如下规则：
+  必须至少包含两段（一个或多个圆点）。
+  每段必须以字母开头。
+  所有字符必须为字母数字或下划线 [a-zA-Z0-9_]。
+
+  android中的context.getpackage() 通常指的是获得applicationId, 默认设置时两者相同，会联想到packager，实际是不一样的。
+
+
+  尽管清单 package 和 Gradle applicationId 可以具有不同的名称，但构建工具会在构建结束时将应用 ID 复制到 APK 的最终清单文件中。
+  所以，如果您在构建后检查 AndroidManifest.xml 文件，package 属性发生更改就不足为奇。
+  实际上，Google Play 商店和 Android 平台会注意 package 属性来标识您的应用；
+  所以构建利用原始值后（用作 R 类的命名空间并解析清单类名称），它将会舍弃此值并将其替换为应用 ID（最终正式签名的时候）

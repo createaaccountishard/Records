@@ -1,0 +1,7 @@
+
+1 intent-filter 只存在activity service receiver 中，可以有多个
+
+2 intent-filter 中有3类，action  category  data 
+3 action 是意图，可以用标准的，可以自定义
+4 category 是类别
+5 data 是uri的定义，多个data 可以组成一个，最终组成的是1个uri
