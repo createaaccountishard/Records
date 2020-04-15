@@ -1,0 +1,42 @@
+1 库名称: picasso  谐音毕加索,著名的画家,意味着是和图像相关的库.
+   该库是对图像加载进行处理的库.
+   图片加载的主要原则是三级缓存.
+
+2 对外API
+   对外暴露的API按照类型主要分四类. 
+   a:获取单例对象  with 
+   b:加载图像        load
+   c:图像变换        根据变化的类型进行选择
+   d:显示到view    into
+
+3 获取单例对象
+   对外暴露的对象是picasso,该对象是单例的,饿汉式的.该对象是全局唯一的,只能有一个.
+   单例对象的创建使用的是builder,构建者模式.
+   单例对象的创建使用了类锁.具体是锁的代码块.
+
+   单例对象持有一些核心的属性或对象.如context, downloader,executorservice,cache,transformer,listener,requesthandler,bitmapconfig,logging等
+   这些属性的设置通过builder进行设置. 最后的build方法会返回单例对象. 
+   单例对象通过构造函数指定这些值,主要是考虑到此对象为唯一,build方法会提供默认的实现对象.
+   可以提供方法setSingleton()来设置自定义的对象.
+   
+3 内建对象分析
+   downloader 接口  
+   用于下载图片文件.可以从网络,可以从磁盘. 这里把从磁盘获取文件当做一个下载动作.
+   下载接口 load(), 使用uri. 可以配置下载的policy,即是否进行一些检查. 返回response.
+   response 类,内部类,接受bitmap或者流数据. 还有一些其他属性,如数据的大小.
+
+   downloader的实现有两种,一个是urlconnection,一个是okhttp. 优先使用okhttp,使用反射进行的区分.
+   urlconnectiondownloader的实现中,使用网络缓存cache,该缓存的默认实现是httpresponsecache.
+   okhttpdownloader的实现中,使用的网络缓存是okhttp中的默认设置.
+   缓存的具体使用是在http报文头中添加Cache-Control.
+   新的downloader只使用okhttp3来实现.                            
+
+   dispatcher 对象
+   分发请求.
+
+ 4 流程
+
+   获取picasso实例->加载图片参数->请求创建器->请求构建器->设置请求的各种参数->创建请求->创建action-> 分发action->创建hunter->线程池执行run->hunt()->result
+->分发结果->调用action的回调.
+
+                        

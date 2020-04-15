@@ -1,0 +1,10 @@
+1 按照Ubuntu的介绍,完成系统的安装后,wifi模块无论怎么也打不开.
+   解决方式: 禁用acer地带的wmi模块
+
+2 修改文件位置
+   2.1 赋予修改权限 chmod 777 blacklist.conf
+   2.2 在blacklist.conf 的最后新增 
+         blacklist edac
+         blacklist acer-wmi
+   2.3 文件的位置
+         /etc/modprobe.d/blacklist.conf

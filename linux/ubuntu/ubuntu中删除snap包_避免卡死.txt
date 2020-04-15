@@ -1,0 +1,4 @@
+
+在终端工具中输入:
+
+sudo apt autoremove --purge snapd
